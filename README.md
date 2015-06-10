@@ -10,7 +10,13 @@ A tool to help npm module developers make API transitions less painful for their
         coffee app.coffee --repo=[../repo/base/dir/] --target=[relative/to/--repo] --old=[OldApiSHA] --new=[NewApiSHA]  >  adapter.coffee
         # move the generated adapter.coffee to the same directory as the target module. replace any reference to the target module with adapter.coffee
 ## Example
-        # required: regenerate the adapter for v1 to v2
+        # Optional: generate the adapter to go from v1 to v2, or just use the existing one
+        # Repo: this one
+        # Target: example_module.coffee in the example folder
+        # example_module.coffee OLD SHA: 3fbd743d7f7c259a607872ca6ff2acb70de97408
+        # the above version of example_module.coffee can be found in old_example_module.coffee without having to checkout the commit
+        # example_module.coffee NEW SHA: 73c88d51b33b9a413bc23281c01ddfca76603319
+        # Pipe: outputed skeleton to the example folder
         coffee app.coffee --repo=./ --target=example/example_module.coffee --old=3fbd743d7f7c259a607872ca6ff2acb70de97408 --new=73c88d51b33b9a413bc23281c01ddfca76603319 > example/adapterv1-v2.coffee
 
         # run some examples using different versions of the module
