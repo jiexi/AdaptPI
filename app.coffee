@@ -186,6 +186,7 @@ main = ->
       # Diff the changes
       methods_diff = diff_methods old_methods, new_methods
       class_name = parse_class_name new_target
+      #console.log methods_diff
       console.log generate_adapter argv.target, methods_diff
 
 
