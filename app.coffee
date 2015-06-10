@@ -49,33 +49,43 @@ parse_class_name = (content) ->
 
 
 diff_params = (old_params, new_params) ->
-  if old_params.length != new_params.length
+  if old_params.length isnt new_params.length
     return false
-  else if old_params.join() != new_params.join()
+  else if old_params.join() isnt new_params.join()
     return false
   else
     return true
 
 
 diff_methods = (old_methods, new_methods) ->
-  added_methods = {};
-  removed_methods = {};
-  changed_methods = {};
-  unchanged_methods = {};
+  added_methods = {}
+  removed_methods = {}
+  changed_methods = {}
+  unchanged_methods = {}
+  renamed_methods = {}
 
-  for name, impl of old_methods
+  for name, old_impl of old_methods
     unless new_methods[name]? # method with same name no longer exists
-      removed_methods[name] = impl
-    else if !(diff_params old_methods[name].param, new_methods[name].param) # params have changed
-      changed_methods[name] = {old_method: old_methods[name], new_method: new_methods[name]}
+      renamed = false
+      for new_name, new_impl of new_methods # make sure no other methods have same param and body
+        if (diff_params old_impl.param, new_impl.param) and old_impl.body is new_impl.body
+          renamed = true
+          old_impl.new_name = new_name
+          renamed_methods[name] = old_impl
+          delete new_methods[new_name]
+          break
+      unless renamed
+        removed_methods[name] = old_impl
+    else if !(diff_params old_impl.param, new_methods[name].param) # params have changed
+      changed_methods[name] = {old_method: old_impl, new_method: new_methods[name]}
     else
       unchanged_methods[name] = new_methods[name] # params and name have not changed
 
-  for name, impl of new_methods
+  for name, new_impl of new_methods
     unless old_methods[name]? # method with same name did not exist previously
-      added_methods[name] = impl
+      added_methods[name] = new_impl
 
-  return {added_methods, removed_methods, changed_methods, unchanged_methods}
+  return {added_methods, removed_methods, changed_methods, unchanged_methods, renamed_methods}
 
 
 generate_adapter = (import_file, methods_diff) ->
@@ -92,6 +102,7 @@ generate_adapter = (import_file, methods_diff) ->
       content += "    console.log \"Deprecated method #{name} was called\"\n\n"
     content += "\n"
 
+
   # handle changed methods
   if Object.keys(methods_diff.changed_methods).length > 0
     content += "  # The following methods have changed interfaces\n"
@@ -99,6 +110,16 @@ generate_adapter = (import_file, methods_diff) ->
       content += "  #{name}: (#{old_method.param.join(', ')}) ->\n"
       content += "    # Make changes necessary to old input to match new expected input below\n"
       content += "    super(#{new_method.param.join(', ')})\n\n"
+    content += "\n"
+
+
+  # handle renamed methods
+  if Object.keys(methods_diff.renamed_methods).length > 0
+    content += "  # The following methods have been renamed\n"
+    for name, impl of methods_diff.renamed_methods
+      content += "  #{name}: (#{impl.param.join(', ')}) ->\n"
+      content += "    # Automatically mapped to new function name\n"
+      content += "    @#{impl.new_name}(#{impl.param.join(', ')})\n\n"
     content += "\n"
 
 
