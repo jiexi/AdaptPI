@@ -22,6 +22,7 @@ parse_target_content = (content) ->
   method_regex = ///(?:#{spaces}([^:^\s]+):\s*(?:\(([^\)]*)\))?\s*[-=]>)((?:.|[\r\n])*?)(?:\r\n|\n|\r){3,}///
 
   methods = {}
+  content = content.replace(/\r?\n/g, "\n");
   method = method_regex.exec content
   while method
     entire_method = method[0]
@@ -186,7 +187,7 @@ main = ->
       # Diff the changes
       methods_diff = diff_methods old_methods, new_methods
       class_name = parse_class_name new_target
-      #console.log methods_diff
+      #console.log methods_diff.changed_methods.param_reorder_method
       console.log generate_adapter argv.target, methods_diff
 
 
