@@ -1,4 +1,4 @@
-Adaptee = require "example_module.coffee"
+Adaptee = require "./example_module.coffee"
 
 class Adapter extends Adaptee
 
