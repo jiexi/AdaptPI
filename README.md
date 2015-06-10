@@ -11,7 +11,7 @@ A tool to help npm module developers make API transitions less painful for their
         # move adapter.coffee to the same directory as the target module. replace any reference to the target module with adapter.coffee
 ## Example
         # required: regenerate the adapter for v1 to v2
-        coffee app.coffee --repo=./ --target=example/example_module.coffee --old=3fbd743d7f7c259a607872ca6ff2acb70de97408 --new=503f4a28728f386a384aae007d3ff334b5345a59 > example/adapterv1-v2.coffee
+        coffee app.coffee --repo=./ --target=example/example_module.coffee --old=3fbd743d7f7c259a607872ca6ff2acb70de97408 --new=73c88d51b33b9a413bc23281c01ddfca76603319 > example/adapterv1-v2.coffee
         cd example
         coffee example_usage.coffee old_example_module.coffee #directly using v1 of module
         coffee example_usage.coffee example_module.coffee #directly using v2 of module
