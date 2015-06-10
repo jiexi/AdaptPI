@@ -91,7 +91,7 @@ diff_methods = (old_methods, new_methods) ->
 generate_adapter = (import_file, methods_diff) ->
   #console.log methods_diff
   [..., target] = import_file.split('/')
-  content =  "Adaptee = require \"#{target}\"\n\n"
+  content =  "Adaptee = require \"./#{target}\"\n\n"
   content += "class Adapter extends Adaptee\n\n"
 
   # handle removed methods
