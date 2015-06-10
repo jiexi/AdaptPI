@@ -1,4 +1,4 @@
-#Module Version 1.0
+#Module Version 2.0
 
 class Example
 
@@ -10,21 +10,27 @@ class Example
     console.log 'stays the same'
 
 
-  changing_method: (param1) ->
+  # param2, param3 added
+  changing_method: (param1, param2, param3) ->
     console.log 'going to be changed'
 
-  param_reorder_method: (x, y) ->
+
+  # x and y swapped
+  param_reorder_method: (y, x) ->
     console.log 'params swap'
 
-  to_be_removed_method: ->
-    console.log 'i will be removed'
+
+  #to_be_removed_method removed
 
 
-  to_be_renamed_method: (hi) ->
+  #renamed, but param and body must remain same
+  renamed_method: (hi) ->
     console.log 'going to be renamed'
 
 
-  #to_be_added_method
+  to_be_added_method: (foo) ->
+    console.log 'new v2.0 method'
+
 
 
 module.exports = Example
