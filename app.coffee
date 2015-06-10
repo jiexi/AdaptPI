@@ -48,6 +48,14 @@ parse_class_name = (content) ->
   (class_regex.exec content)[1]
 
 
+missing_params = (old_params, new_params) ->
+  missing = []
+  for param in new_params
+    if param not in old_params
+      missing.push param
+  return missing
+
+
 diff_params = (old_params, new_params) ->
   if old_params.length isnt new_params.length
     return false
@@ -96,7 +104,7 @@ generate_adapter = (import_file, methods_diff) ->
 
   # handle removed methods
   if Object.keys(methods_diff.removed_methods).length > 0
-    content += "  # The following methods no longer exist\n"
+    content += "  #*** The following methods no longer exist ***\n"
     for name, impl of methods_diff.removed_methods
       content += "  #{name}: (#{impl.param.join(', ')}) ->\n"
       content += "    # Do nothing when called, or pass args to the newer replacement method\n"
@@ -106,17 +114,19 @@ generate_adapter = (import_file, methods_diff) ->
 
   # handle changed methods
   if Object.keys(methods_diff.changed_methods).length > 0
-    content += "  # The following methods have changed interfaces\n"
+    content += "  #*** The following methods have changed interfaces ***\n"
     for name, {old_method, new_method} of methods_diff.changed_methods
       content += "  #{name}: (#{old_method.param.join(', ')}) ->\n"
       content += "    # Make changes necessary to old input to match new expected input below\n"
+      for param in (missing_params old_method.param, new_method.param)
+        content += "    #{param} = undefined\n"
       content += "    super(#{new_method.param.join(', ')})\n\n"
     content += "\n"
 
 
   # handle renamed methods
   if Object.keys(methods_diff.renamed_methods).length > 0
-    content += "  # The following methods have been renamed\n"
+    content += "  #*** The following methods have been renamed ***\n"
     for name, impl of methods_diff.renamed_methods
       content += "  #{name}: (#{impl.param.join(', ')}) ->\n"
       content += "    # Automatically mapped to new function name\n"
@@ -126,7 +136,7 @@ generate_adapter = (import_file, methods_diff) ->
 
   # handle unchanged methods
   if Object.keys(methods_diff.unchanged_methods).length > 0
-    content += "  # The following methods have not changed interfaces\n"
+    content += "  #*** The following methods have not changed interfaces ***\n"
     for name, impl of methods_diff.unchanged_methods
       content += "  # #{name}: (#{impl.param.join(', ')})\n"
     content += "\n\n"
@@ -134,7 +144,7 @@ generate_adapter = (import_file, methods_diff) ->
 
   # handle added methods
   if Object.keys(methods_diff.added_methods).length > 0
-    content += "  # The following methods have been added\n"
+    content += "  #*** The following methods have been added ***\n"
     for name, impl of methods_diff.added_methods
       content += "  # #{name}: (#{impl.param.join(', ')})\n"
     content += "\n\n"
@@ -146,7 +156,7 @@ generate_adapter = (import_file, methods_diff) ->
 main = ->
   # Make sure correct arguments have been provided
   if (!argv.old or !argv.new or !argv.repo or !argv.target)
-    console.log "Usage: --repo=[../repo/base/dir/] --target=[relative/to/repo] --old=[OldApiSHA] --new=[NewApiSHA]"
+    console.log "Usage: --repo=[../repo/base/dir/] --target=[relative/to/repo] --old=[OldApiSHA] --new=[NewApiSHA] > adapter.coffee"
     return
 
   # Grab old content of target
