@@ -12,6 +12,7 @@ class Example
 
   changing_method: (param1) ->
     console.log 'going to be changed'
+    console.log arguments
 
 
   param_reorder_method: (x, y, z) ->
