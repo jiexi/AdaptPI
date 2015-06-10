@@ -32,7 +32,7 @@ class Example
 
 
   to_be_added_method: ->
-    console.log 'this method didnt exist before'
+    console.log 'this method didnt exist before, but now it does'
 
 
 
