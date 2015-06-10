@@ -89,8 +89,9 @@ diff_methods = (old_methods, new_methods) ->
 
 
 generate_adapter = (import_file, methods_diff) ->
-  console.log methods_diff
-  content =  "Adaptee = require \"#{import_file}\"\n\n"
+  #console.log methods_diff
+  [..., target] = import_file.split('/')
+  content =  "Adaptee = require \"#{target}\"\n\n"
   content += "class Adapter extends Adaptee\n\n"
 
   # handle removed methods
@@ -164,12 +165,14 @@ main = ->
       new_target = content
       new_methods = parse_target_content new_target
 
+      ###
       console.log '=================OLD=================='
       console.log old_target
       console.log '=================NEW=================='
       console.log new_target
 
       console.log '=================---=================='
+      ###
       # Diff the changes
       methods_diff = diff_methods old_methods, new_methods
       class_name = parse_class_name new_target
